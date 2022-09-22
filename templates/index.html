@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Music URL Share</title>
+
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        body{
+            width: 100%;
+            height: 100vh;
+        }
+
+        h1{
+            margin: 10% 0;
+        }
+
+        body div{
+            margin: 10% auto;
+            width: 50%;
+            text-align: center;
+        }
+
+        form{
+
+        }
+
+        input[type=text]{
+            width: 60%;
+            height: 40px;
+            padding: 3px 10px;
+        }
+
+        select{
+            width:25%;
+            height: 50px;
+            padding: 3px;
+        }
+
+        input[type=submit]{
+            width: fit-content;
+            height: 50px;
+            padding: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Music URL Share</h1>
+        <form action="#" method="get">
+            <label>
+                <input type="text" placeholder="paste url" id="url"
+                       value="https://music.youtube.com/watch?v=oMfMUfgjiLg&feature=share" required>
+            </label>
+            <label>
+                <select id="platform" required>
+                    <option value="spotify">Spotify</option>
+                    <option value="apple-music">Apple Music</option>
+                    <option value="youtube-music" selected>YouTube Music</option>
+                </select>
+            </label>
+            <input type="submit" value="GO">
+        </form>
+        <div id="urls">
+            <p><i>Paste url and select GO</i></p>
+        </div>
+    </div>
+
+    <script>
+        let urlInput = document.getElementById("url")
+        let urlsDiv = document.getElementById("urls")
+        let platformSelect = document.getElementById("platform")
+
+        const element = document.querySelector('form');
+        element.addEventListener('submit', event => {
+          event.preventDefault();
+          urlsDiv.innerHTML = "<p style='color:green'>Loading...</p>";
+
+          let xmlHttpRequest = new XMLHttpRequest();
+            xmlHttpRequest.onreadystatechange = function() {
+                if (this.readyState === 4 && this.status === 200) {
+                    urlsDiv.innerHTML = "";
+                    let urls = JSON.parse(this.responseText)
+
+                    for (const service in urls) {
+                      urlsDiv.innerHTML += `<p>${service}: <a href="${urls[service]}">${urls[service]}</a></p>`
+                    }
+
+                }else if (this.readyState === 4 && this.status !== 200){
+                    urlsDiv.innerHTML = "<p style='color:red'>Error!</p>";
+                }
+            };
+            xmlHttpRequest.open("GET", `/urls?platform=${platformSelect.value}&url=${urlInput.value}`, true);
+            xmlHttpRequest.send();
+        });
+
+    </script>
+</body>
+</html>
