@@ -4,13 +4,11 @@ except ImportError:
     from typing_extensions import Literal
 
 from fastapi import FastAPI, HTTPException
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from utils import get_youtube_music_track_details, get_apple_music_track_details, get_spotify_track_details, \
-    get_spotify_track_url
+    get_spotify_track_url_info, get_apple_music_track_url_info, get_youtube_music_track_url_info
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/urls")
@@ -22,17 +20,16 @@ async def get_urls(platform: Literal["apple-music", "spotify", "youtube-music"],
             "spotify": get_spotify_track_details,
         }[platform](url)
 
-        urls = {}
-        # for service in ["apple-music", "spotify", "youtube-music"]: todo
-        for service in ["spotify"]:
+        urls = []
+        for service in ["apple-music", "spotify", "youtube-music"]:
             if platform == service:
                 continue
 
-            urls[service] = {
-                "apple-music": get_spotify_track_url,
-                "youtube-music": get_spotify_track_url,
-                "spotify": get_spotify_track_url,
-            }[service](title, artist)
+            urls.append({
+                "apple-music": get_apple_music_track_url_info,
+                "youtube-music": get_youtube_music_track_url_info,
+                "spotify": get_spotify_track_url_info,
+            }[service](title, artist))
 
     except Exception:
         raise HTTPException(status_code=404, detail="Item not found")

@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 from decouple import config
 from requests.auth import HTTPBasicAuth
 
-
 CLIENT_ID = config("CLIENT_ID")
 CLIENT_SECRET = config("CLIENT_SECRET")
 
@@ -69,21 +68,43 @@ def search_spotify(track_name, artist_name):
     return response.json()
 
 
-def get_spotify_track_url(track_name, artist_name):
+def get_spotify_track_url_info(track_name, artist_name):
     track_info = search_spotify(track_name, artist_name)
-    return track_info["tracks"]["items"][0]["external_urls"]["spotify"]
+    url = track_info["tracks"]["items"][0]["external_urls"]["spotify"]
+    return {
+        "linkText": url,
+        "link": url,
+        "service": "Spotify"
+    }
+
+
+def get_apple_music_track_url_info(track_name, artist_name):
+    return {
+        "linkText": "Coming Soon",
+        "link": "https://music.apple.com/us/browse",
+        "service": "Apple Music"
+    }
+
+
+def get_youtube_music_track_url_info(track_name, artist_name):
+    return {
+        "linkText": "Coming Soon",
+        "link": "https://music.youtube.com/",
+        "service": "YouTube Music"
+    }
 
 
 if __name__ == '__main__':
-    # url = "https://open.spotify.com/track/2Ka2eZtnllhJ8hukVLkXmt?si=RjLJTg0pTXOtZ1hWN-YGng&context=spotify%3Astation%3Atrack%3A60OEb5MtEmmepJPUJtYvFW"
-    # url = "https://open.spotify.com/track/7o2CTH4ctstm8TNelqjb51?si=e03a989b1c034a26"
-    # print(get_spotify_track_details(url))
+    # url = "https://open.spotify.com/track/2Ka2eZtnllhJ8hukVLkXmt?si=RjLJTg0pTXOtZ1hWN-YGng&context=spotify
+    # %3Astation%3Atrack%3A60OEb5MtEmmepJPUJtYvFW" url =
+    # "https://open.spotify.com/track/7o2CTH4ctstm8TNelqjb51?si=e03a989b1c034a26" print(get_spotify_track_details(url))
     #
     # url = "https://music.apple.com/ng/album/sweet-child-o-mine/1377826053?i=1377826892"
     # print(get_apple_music_track_details(url))
     #
-    url = "https://music.youtube.com/watch?v=oMfMUfgjiLg&feature=share"
+    # url =
     # print(get_youtube_music_track_details(url))
 
     get_auth_token()
-    print(get_spotify_track_url(*get_youtube_music_track_details(url)))
+    print(get_spotify_track_url_info(
+        *get_youtube_music_track_details("https://music.youtube.com/watch?v=oMfMUfgjiLg&feature=share")))

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Music URL Share</title>
+	<meta charset="UTF-8">
+	<title>Music URL Share</title>
 
-    <style>
+	<style>
         *{
             margin: 0;
             padding: 0;
@@ -46,58 +46,62 @@
             height: 50px;
             padding: 3px;
         }
-    </style>
+	</style>
 </head>
 <body>
-    <div>
-        <h1>Music URL Share</h1>
-        <form action="#" method="get">
-            <label>
-                <input type="text" placeholder="paste url" id="url"
-                       value="https://music.youtube.com/watch?v=oMfMUfgjiLg&feature=share" required>
-            </label>
-            <label>
-                <select id="platform" required>
-                    <option value="spotify">Spotify</option>
-                    <option value="apple-music">Apple Music</option>
-                    <option value="youtube-music" selected>YouTube Music</option>
-                </select>
-            </label>
-            <input type="submit" value="GO">
-        </form>
-        <div id="urls">
-            <p><i>Paste url and select GO</i></p>
-        </div>
-    </div>
+<div>
+	<h1>Music URL Share</h1>
+	<form action="#" method="get">
+		<label>
+			<input type="text" placeholder="paste url" id="url"
+				   value="https://music.youtube.com/watch?v=oMfMUfgjiLg&feature=share" required>
+		</label>
+		<label>
+			<select id="platform" required>
+				<option value="spotify">Spotify</option>
+				<option value="apple-music">Apple Music</option>
+				<option value="youtube-music" selected>YouTube Music</option>
+			</select>
+		</label>
+		<input type="submit" value="GO">
+	</form>
+	<div id="urls">
+		<p><i><b>Steps</b></i></p>
+		<ol>
+			<li><i>Paste a url from Apple Music, YouTube or Spotify into text box</i></li>
+			<li><i>Select music service the url is from</i></li>
+			<li><i>Click GO</i></li>
+		</ol>
+	</div>
+</div>
 
-    <script>
-        let urlInput = document.getElementById("url")
-        let urlsDiv = document.getElementById("urls")
-        let platformSelect = document.getElementById("platform")
+<script>
+    let urlInput = document.getElementById("url")
+    let urlsDiv = document.getElementById("urls")
+    let platformSelect = document.getElementById("platform")
 
-        const element = document.querySelector('form');
-        element.addEventListener('submit', event => {
-          event.preventDefault();
-          urlsDiv.innerHTML = "<p style='color:green'>Loading...</p>";
+    const element = document.querySelector('form');
+    element.addEventListener('submit', event => {
+        event.preventDefault();
+        urlsDiv.innerHTML = "<p style='color:green'>Loading...</p>";
 
-          let xmlHttpRequest = new XMLHttpRequest();
-            xmlHttpRequest.onreadystatechange = function() {
-                if (this.readyState === 4 && this.status === 200) {
-                    urlsDiv.innerHTML = "";
-                    let urls = JSON.parse(this.responseText)
-
-                    for (const service in urls) {
-                      urlsDiv.innerHTML += `<p>${service}: <a href="${urls[service]}">${urls[service]}</a></p>`
-                    }
-
-                }else if (this.readyState === 4 && this.status !== 200){
-                    urlsDiv.innerHTML = "<p style='color:red'>Error!</p>";
+        let xmlHttpRequest = new XMLHttpRequest();
+        xmlHttpRequest.onreadystatechange = function() {
+            if (this.readyState === 4 && this.status === 200) {
+                urlsDiv.innerHTML = "";
+                let urlInfos = JSON.parse(this.responseText) || {service:null, link:null, linkText:null}
+                for (const urlInfo of urlInfos) {
+                    urlsDiv.innerHTML += `<p>${urlInfo.service}: <a href="${urlInfo.link}">${urlInfo.linkText}</a></p>`
                 }
-            };
-            xmlHttpRequest.open("GET", `/urls?platform=${platformSelect.value}&url=${urlInput.value}`, true);
-            xmlHttpRequest.send();
-        });
 
-    </script>
+            }else if (this.readyState === 4 && this.status !== 200){
+                urlsDiv.innerHTML = "<p style='color:red'>Error!</p>";
+            }
+        };
+        xmlHttpRequest.open("GET", `/urls?platform=${platformSelect.value}&url=${urlInput.value}`, true);
+        xmlHttpRequest.send();
+    });
+
+</script>
 </body>
 </html>
