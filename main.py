@@ -23,7 +23,8 @@ async def get_urls(platform: Literal["apple-music", "spotify", "youtube-music"],
         }[platform](url)
 
         urls = {}
-        for service in ["apple-music", "spotify", "youtube-music"]:
+        # for service in ["apple-music", "spotify", "youtube-music"]: todo
+        for service in ["spotify"]:
             if platform == service:
                 continue
 
