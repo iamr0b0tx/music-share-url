@@ -35,6 +35,7 @@ def get_youtube_music_track_details(yt_music_url):
     """ takes url and return song title and artist name """
     response = requests.get(yt_music_url)
     soup = BeautifulSoup(response.content, 'html.parser')
+    print(soup.prettify())
     title = soup.find("meta", property="og:title")
     video_tags = soup.findAll("meta", property="og:video:tag")
     title_tag = title and next(filter(lambda x: x["content"] in title["content"], video_tags), None)
@@ -68,6 +69,7 @@ def search_spotify(track_name, artist_name):
 
 
 def get_spotify_track_url_info(track_name, artist_name):
+    print(artist_name, track_name)
     track_info = search_spotify(track_name, artist_name)
     url = track_info["tracks"]["items"][0]["external_urls"]["spotify"]
     return {
