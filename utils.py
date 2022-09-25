@@ -3,12 +3,13 @@ from urllib.parse import quote
 import requests
 from bs4 import BeautifulSoup
 from decouple import config
+from requests import utils
 from requests.auth import HTTPBasicAuth
 
 SPOTIFY_CLIENT_ID = config("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = config("SPOTIFY_CLIENT_SECRET")
 DEFAULT_HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                                 'Chrome/102.0.0.0 Safari/537.36'}
+                                 'Chrome/102.0.0.0 Safari/537.36', **utils.default_headers()}
 
 
 def get_spotify_track_details(spotify_url):
