@@ -7,11 +7,13 @@ from requests.auth import HTTPBasicAuth
 
 SPOTIFY_CLIENT_ID = config("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = config("SPOTIFY_CLIENT_SECRET")
+DEFAULT_HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                                 'Chrome/102.0.0.0 Safari/537.36'}
 
 
 def get_spotify_track_details(spotify_url):
     """ takes url and return song title and artist name """
-    response = requests.get(spotify_url)
+    response = requests.get(spotify_url, headers=DEFAULT_HEADERS)
     soup = BeautifulSoup(response.content, 'html.parser')
     title = soup.find("meta", property="og:title")
     description = soup.find("meta", property="og:description")
@@ -22,7 +24,7 @@ def get_spotify_track_details(spotify_url):
 
 def get_apple_music_track_details(apple_music_url):
     """ takes url and return song title and artist name """
-    response = requests.get(apple_music_url)
+    response = requests.get(apple_music_url, headers=DEFAULT_HEADERS)
     soup = BeautifulSoup(response.content, 'html.parser')
     title = soup.find("meta", attrs={"name": "apple:title"})
     title = title and title["content"]
@@ -33,7 +35,7 @@ def get_apple_music_track_details(apple_music_url):
 
 def get_youtube_music_track_details(yt_music_url):
     """ takes url and return song title and artist name """
-    response = requests.get(yt_music_url)
+    response = requests.get(yt_music_url, headers=DEFAULT_HEADERS)
     soup = BeautifulSoup(response.content, 'html.parser')
     print(soup.prettify())
     title = soup.find("meta", property="og:title")
