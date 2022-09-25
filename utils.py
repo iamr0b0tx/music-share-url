@@ -39,12 +39,13 @@ def get_apple_music_track_details(apple_music_url):
 def get_youtube_music_track_details(yt_music_url):
     """ takes url and return song title and artist name """
     parsed_url = urlsplit(yt_music_url)
-    video_id = parsed_url and parsed_url.query and parsed_url.query.split("&")[0].replace(b"v=", b"", 1)
-    if video_id:
+    query_params = parsed_url and parsed_url.query and parsed_url.query.split("&")
+
+    if video_id := query_params[0].replace("v=", "", 1):
         response = requests.get(f"https://youtube.googleapis.com/youtube/v3/videos?part=snippet&maxResults=1&"
                                 f"id={video_id}&key={YOUTUBE_API_KEY}", headers=DEFAULT_HEADERS).json()
-        items = response["items"]
-        if items:
+
+        if items := response["items"]:
             title = items[0]["snippet"]["title"]
             artist = items[0]["snippet"]["channelTitle"].replace("- Topic", "", 1)
             return title, artist
@@ -83,7 +84,6 @@ def search_youtube(track_name, artist_name):
 
 def get_spotify_track_url_info(track_name, artist_name):
     track_info = search_spotify(track_name, artist_name)
-    print(track_info)
     url = track_info["tracks"]["items"][0]["external_urls"]["spotify"]
     return {
         "linkText": url,
