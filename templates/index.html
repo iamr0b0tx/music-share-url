@@ -91,7 +91,7 @@
                 urlsDiv.innerHTML = "";
                 let urlInfos = JSON.parse(this.responseText) || {service:null, link:null, linkText:null}
                 for (const urlInfo of urlInfos) {
-                    urlsDiv.innerHTML += `<p>${urlInfo.service}: <a href="${urlInfo.link}">${urlInfo.linkText}</a></p>`
+                    urlsDiv.innerHTML += `<p>${urlInfo.service}: <a href="${urlInfo.link}" target="_blank">${urlInfo.linkText}</a></p>`
                 }
 
             }else if (this.readyState === 4 && this.status !== 200){
