@@ -1,10 +1,11 @@
-from urllib.parse import quote, urlparse
+from urllib.parse import quote, urlsplit
 
 import requests
 from bs4 import BeautifulSoup
 from decouple import config
 from requests import utils
 from requests.auth import HTTPBasicAuth
+from requests.utils import requote_uri
 
 YOUTUBE_API_KEY = config('YOUTUBE_API_KEY')
 SPOTIFY_CLIENT_ID = config("SPOTIFY_CLIENT_ID")
@@ -37,16 +38,18 @@ def get_apple_music_track_details(apple_music_url):
 
 def get_youtube_music_track_details(yt_music_url):
     """ takes url and return song title and artist name """
-    parsed_url = urlparse(yt_music_url)
-    video_id = parsed_url and parsed_url.query and parsed_url.query.replace("v=", "", 1)
-    if not video_id:
-        return None, None
+    parsed_url = urlsplit(yt_music_url)
+    video_id = parsed_url and parsed_url.query and parsed_url.query.split("&")[0].replace(b"v=", b"", 1)
+    if video_id:
+        response = requests.get(f"https://youtube.googleapis.com/youtube/v3/videos?part=snippet&maxResults=1&"
+                                f"id={video_id}&key={YOUTUBE_API_KEY}", headers=DEFAULT_HEADERS).json()
+        items = response["items"]
+        if items:
+            title = items[0]["snippet"]["title"]
+            artist = items[0]["snippet"]["channelTitle"].replace("- Topic", "", 1)
+            return title, artist
 
-    response = requests.get(f"https://youtube.googleapis.com/youtube/v3/videos?part=snippet&maxResults=1&"
-                            f"id={video_id}&key={YOUTUBE_API_KEY}", headers=DEFAULT_HEADERS).json()
-    title = response["items"][0]["snippet"]["title"]
-    artist = response["items"][0]["snippet"]["channelTitle"].replace("- Topic", "", 1)
-    return title, artist
+    return None, None
 
 
 def get_auth_credentials():
@@ -62,7 +65,7 @@ def get_auth_token():
 
 
 def search_spotify(track_name, artist_name):
-    q = quote(f"{track_name} track:{track_name} artist:{artist_name}")
+    q = requote_uri(f"{track_name} artist:{artist_name}")
     return requests.get(
         f"https://api.spotify.com/v1/search?type=track&include_external=audio&limit=1&q={q}",
         headers={
@@ -73,13 +76,14 @@ def search_spotify(track_name, artist_name):
 
 
 def search_youtube(track_name, artist_name):
-    q = quote(f"{track_name} {artist_name}")
+    q = requote_uri(f"{track_name} {artist_name}")
     return requests.get(f"https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&"
                         f"type=video&q={q}&key={YOUTUBE_API_KEY}", headers=DEFAULT_HEADERS).json()
 
 
 def get_spotify_track_url_info(track_name, artist_name):
     track_info = search_spotify(track_name, artist_name)
+    print(track_info)
     url = track_info["tracks"]["items"][0]["external_urls"]["spotify"]
     return {
         "linkText": url,
