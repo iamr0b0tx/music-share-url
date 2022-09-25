@@ -5,8 +5,8 @@ from bs4 import BeautifulSoup
 from decouple import config
 from requests.auth import HTTPBasicAuth
 
-CLIENT_ID = config("CLIENT_ID")
-CLIENT_SECRET = config("CLIENT_SECRET")
+SPOTIFY_CLIENT_ID = config("SPOTIFY_CLIENT_ID")
+SPOTIFY_CLIENT_SECRET = config("SPOTIFY_CLIENT_SECRET")
 
 
 def get_spotify_track_details(spotify_url):
@@ -15,7 +15,6 @@ def get_spotify_track_details(spotify_url):
     soup = BeautifulSoup(response.content, 'html.parser')
     title = soup.find("meta", property="og:title")
     description = soup.find("meta", property="og:description")
-
     title = title and title["content"]
     artist = description and description["content"].split(" · Song · ")[0].strip()
     return title, artist
@@ -46,7 +45,7 @@ def get_youtube_music_track_details(yt_music_url):
 
 def get_auth_credentials():
     response = requests.post(
-        f"https://accounts.spotify.com/api/token", auth=HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET),
+        f"https://accounts.spotify.com/api/token", auth=HTTPBasicAuth(SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET),
         data={"grant_type": "client_credentials"}, headers={"Content-Type": "application/x-www-form-urlencoded"}
     )
     return response.json()
