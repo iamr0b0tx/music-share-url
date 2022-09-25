@@ -63,14 +63,19 @@ def get_auth_token():
 
 def search_spotify(track_name, artist_name):
     q = quote(f"{track_name} track:{track_name} artist:{artist_name}")
-    response = requests.get(
+    return requests.get(
         f"https://api.spotify.com/v1/search?type=track&include_external=audio&limit=1&q={q}",
         headers={
             "Authorization": f"Bearer {get_auth_token()}",
             "Content-Type": "application/json"
         }
-    )
-    return response.json()
+    ).json()
+
+
+def search_youtube(track_name, artist_name):
+    q = quote(f"{track_name} {artist_name}")
+    return requests.get(f"https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&"
+                        f"type=video&q={q}&key={YOUTUBE_API_KEY}", headers=DEFAULT_HEADERS).json()
 
 
 def get_spotify_track_url_info(track_name, artist_name):
@@ -92,9 +97,12 @@ def get_apple_music_track_url_info(track_name, artist_name):
 
 
 def get_youtube_music_track_url_info(track_name, artist_name):
+    track_info = search_youtube(track_name, artist_name)
+    video_id = track_info["items"][0]["id"]["videoId"]
+    link = video_id and f"https://music.youtube.com/watch?v={video_id}"
     return {
-        "linkText": "Coming Soon",
-        "link": "https://music.youtube.com/",
+        "linkText": link,
+        "link": link,
         "service": "YouTube Music"
     }
 
