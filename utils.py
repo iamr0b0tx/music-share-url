@@ -1,4 +1,4 @@
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -6,10 +6,11 @@ from decouple import config
 from requests import utils
 from requests.auth import HTTPBasicAuth
 
+YOUTUBE_API_KEY = config('YOUTUBE_API_KEY')
 SPOTIFY_CLIENT_ID = config("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = config("SPOTIFY_CLIENT_SECRET")
-DEFAULT_HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                                 'Chrome/102.0.0.0 Safari/537.36', **utils.default_headers()}
+DEFAULT_HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                                 'Chrome/105.0.0.0 Safari/537.36', **utils.default_headers()}
 
 
 def get_spotify_track_details(spotify_url):
@@ -36,14 +37,15 @@ def get_apple_music_track_details(apple_music_url):
 
 def get_youtube_music_track_details(yt_music_url):
     """ takes url and return song title and artist name """
-    response = requests.get(yt_music_url, headers=DEFAULT_HEADERS)
-    soup = BeautifulSoup(response.content, 'html.parser')
-    print(soup.prettify())
-    title = soup.find("meta", property="og:title")
-    video_tags = soup.findAll("meta", property="og:video:tag")
-    title_tag = title and next(filter(lambda x: x["content"] in title["content"], video_tags), None)
-    title = title_tag and title_tag["content"]
-    artist = video_tags and video_tags[0]["content"]
+    parsed_url = urlparse(yt_music_url)
+    video_id = parsed_url and parsed_url.query and parsed_url.query.replace("v=", "", 1)
+    if not video_id:
+        return None, None
+
+    response = requests.get(f"https://youtube.googleapis.com/youtube/v3/videos?part=snippet&maxResults=1&"
+                            f"id={video_id}&key={YOUTUBE_API_KEY}", headers=DEFAULT_HEADERS).json()
+    title = response["items"][0]["snippet"]["title"]
+    artist = response["items"][0]["snippet"]["channelTitle"].replace("- Topic", "", 1)
     return title, artist
 
 
@@ -72,7 +74,6 @@ def search_spotify(track_name, artist_name):
 
 
 def get_spotify_track_url_info(track_name, artist_name):
-    print(artist_name, track_name)
     track_info = search_spotify(track_name, artist_name)
     url = track_info["tracks"]["items"][0]["external_urls"]["spotify"]
     return {

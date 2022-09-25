@@ -31,7 +31,8 @@ async def get_urls(platform: Literal["apple-music", "spotify", "youtube-music"],
                 "spotify": get_spotify_track_url_info,
             }[service](title, artist))
 
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=404, detail="Item not found")
 
     return urls
