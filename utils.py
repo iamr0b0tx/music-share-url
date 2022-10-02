@@ -1,4 +1,4 @@
-from urllib.parse import quote, urlsplit
+from urllib.parse import urlsplit
 
 import requests
 from bs4 import BeautifulSoup
