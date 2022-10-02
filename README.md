@@ -1,5 +1,5 @@
 # music-share-url
-![example workflow](https://github.com/iamr0b0tx/music-share-url/actions/workflows/main.yml/badge.svg) <br>
+![example workflow](https://github.com/iamr0b0tx/music-share-url/actions/workflows/CI.yml/badge.svg) <br>
 Generate urls for a track given url for a track from any platform. Currently, supports Spotify and YouTube Music.
 
 Application currently hosted at [https://music-url-share.herokuapp.com/](https://music-url-share.herokuapp.com/)
