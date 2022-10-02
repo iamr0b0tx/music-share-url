@@ -84,7 +84,9 @@ def search_youtube(track_name, artist_name):
 
 def get_spotify_track_url_info(track_name, artist_name):
     track_info = search_spotify(track_name, artist_name)
-    url = track_info["tracks"]["items"][0]["external_urls"]["spotify"]
+    url = None
+    if tracks := track_info["tracks"]["items"]:
+        url = tracks[0]["external_urls"]["spotify"]
     return {
         "linkText": url,
         "link": url,
@@ -102,8 +104,10 @@ def get_apple_music_track_url_info(track_name, artist_name):
 
 def get_youtube_music_track_url_info(track_name, artist_name):
     track_info = search_youtube(track_name, artist_name)
-    video_id = track_info["items"][0]["id"]["videoId"]
-    link = video_id and f"https://music.youtube.com/watch?v={video_id}"
+    link = None
+    if tracks := track_info["items"]:
+        video_id = tracks[0]["id"]["videoId"]
+        link = video_id and f"https://music.youtube.com/watch?v={video_id}"
     return {
         "linkText": link,
         "link": link,
